@@ -6,7 +6,7 @@ import { ModalController, NavParams, AlertController, LoadingController } from '
 /**
  * Luna Save File Manager
  * 
- * Developed by Gustavo H. S. Andrae
+ * Developed by Gustavo H. S. Andrade
  * 
  * Create an interface to save a file on user's device
  *
@@ -66,7 +66,6 @@ export class LunaSaveFile {
       });
 
       setTimeout(()=> {
-        console.log('PARENT 4: '+currentEntry.isDirectory);
           this.currentEntry = currentEntry;
       }, 100)
 
@@ -74,8 +73,6 @@ export class LunaSaveFile {
     )
     
   }
-
-
 
    /*
   Return an array with list of subdirectories
@@ -110,7 +107,7 @@ export class LunaSaveFile {
     }, 100);
 
 
-    
+  
     // List directories
     return this.file.resolveDirectoryUrl(this.file.externalRootDirectory+url)
     .then((directoryEntry) => {
@@ -129,7 +126,6 @@ export class LunaSaveFile {
 
   }
 
-
   // Download and save de File on current directory
   startDownload()
   {
@@ -140,7 +136,7 @@ export class LunaSaveFile {
         inputs: [
           {
             name:'name',
-            placeholder: 'Name do save'
+            placeholder: 'Name to save'
           },
         ],
         buttons: [
@@ -157,9 +153,7 @@ export class LunaSaveFile {
     });
 
     alertGetName.present();
-    
   }
-
 
   saveFile(name:string)
   {
@@ -172,10 +166,6 @@ export class LunaSaveFile {
     });
 
     loading.present();
-
-    console.log('DOWNLOAD DE: '+this.url );
-
-    console.log('SALVANDO EM: '+pathSave);
 
     this.fileTransfer.download(this.url, pathSave)
     .then((resDownload) => {
@@ -195,14 +185,13 @@ export class LunaSaveFile {
       alertSuccess.present();
 
     }, (error) => {
-      console.log('ERROR DE DOWNLOAD: ');
-      console.log(error);
+      
       loading.dismiss();
 
       let alertError = this.alertCtrl.create({
         message: "File could not be downloaded.",
         buttons: [
-          'OKD'
+          'OK'
         ]
       })
 
@@ -214,13 +203,11 @@ export class LunaSaveFile {
 
   }
 
-
   getFileExtension(url:string):string
   {
     let stringArray = url.split('.');
     return stringArray[stringArray.length-1];
   }
-
 
 
 }
