@@ -1,7 +1,8 @@
-import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
-import { File, IFile, Entry } from '@ionic-native/file';
+import { FileTransfer, FileTransferObject } from '@ionic-native/file-transfer';
+import { File, Entry } from '@ionic-native/file';
 import { Component } from '@angular/core';
-import { ModalController, NavParams, AlertController, LoadingController } from 'ionic-angular';
+import { NavParams, AlertController, LoadingController } from 'ionic-angular';
+import {messages}  from  './messages'
 
 /**
  * Luna Save File Manager
@@ -23,26 +24,27 @@ export class LunaSaveFile {
   private currentEntry:Entry;
 
 
-  private title:string;
+  private title:string; // Title of the page
   private url:string; // Url of file to download
   private callback; // callback function that return true/false
 
   private fileTransfer: FileTransferObject = this.transfer.create();
 
   constructor(
-    private modalCtrl:ModalController,
     private file:File,
     private navParams:NavParams,
     private alertCtrl:AlertController,
     private transfer: FileTransfer,
-    private loadingCtrl:LoadingController
+    private loadingCtrl:LoadingController,
+    
   ) {
 
-    this.title    = navParams.get('title');
-    this.url      = navParams.get('url');
-    this.callback = navParams.get('callback');
+    this.title    = this.navParams.get('title');
+    this.url      = this.navParams.get('url');
+    this.callback = this.navParams.get('callback');
 
     this.setRootDirectory();
+    
 
   }
 
@@ -70,9 +72,30 @@ export class LunaSaveFile {
       }, 100)
 
       }
-    )
+    ).catch((error) => {
+      console.log("Error: ");
+      console.log(error);
+
+      let alert = this.alertCtrl.create({
+        title: 'Error',
+        message: messages.no_permission,
+        buttons: [
+          { 
+            text:'OK',
+            handler: () => {
+              this.callback(false);
+            }
+          }
+        ]
+      })
+
+      alert.present();
+
+    })
     
   }
+
+
 
    /*
   Return an array with list of subdirectories
@@ -83,7 +106,7 @@ export class LunaSaveFile {
     if(entry.isFile)
     {
       let alert = this.alertCtrl.create({
-        message: "You can't save on a file",
+        message: messages.cant_save_on_file,
         buttons: ['Ok']
       });
 
@@ -107,7 +130,7 @@ export class LunaSaveFile {
     }, 100);
 
 
-  
+    
     // List directories
     return this.file.resolveDirectoryUrl(this.file.externalRootDirectory+url)
     .then((directoryEntry) => {
@@ -126,17 +149,18 @@ export class LunaSaveFile {
 
   }
 
+
   // Download and save de File on current directory
   startDownload()
   {
 
 
     let alertGetName = this.alertCtrl.create({
-        title: 'Save File',
+        title: messages.save_title,
         inputs: [
           {
             name:'name',
-            placeholder: 'Name to save'
+            placeholder: messages.name_file
           },
         ],
         buttons: [
@@ -153,7 +177,9 @@ export class LunaSaveFile {
     });
 
     alertGetName.present();
+    
   }
+
 
   saveFile(name:string)
   {
@@ -162,18 +188,31 @@ export class LunaSaveFile {
     let pathSave = this.file.externalRootDirectory+this.currentEntry.fullPath+name+'.'+extension;
 
     let loading  = this.loadingCtrl.create({
-      content: 'Downloading...'
+      content: messages.downloading_message
     });
+  
+    let uri = encodeURI(this.url);
 
     loading.present();
 
-    this.fileTransfer.download(this.url, pathSave)
+    // Headers do download
+    let options = {};
+
+    if(options == 'pdf')
+    {
+        options = {
+          headers: {
+                // "content-type": "application/pdf"
+          }
+        }
+    };
+
+    this.fileTransfer.download(uri, pathSave, true, options)
     .then((resDownload) => {
-      console.log('Download concluído: ')
       loading.dismiss();
 
       let alertSuccess = this.alertCtrl.create({
-        message: 'File was successfully transfered.',
+        message: messages.successful_download, // File was successfully transfered.
         buttons: [
           'OK'
         ]
@@ -189,7 +228,7 @@ export class LunaSaveFile {
       loading.dismiss();
 
       let alertError = this.alertCtrl.create({
-        message: "File could not be downloaded.",
+        message: messages.error_download,  // File could not be downloaded.
         buttons: [
           'OK'
         ]
@@ -203,11 +242,13 @@ export class LunaSaveFile {
 
   }
 
+
   getFileExtension(url:string):string
   {
     let stringArray = url.split('.');
     return stringArray[stringArray.length-1];
   }
+
 
 
 }

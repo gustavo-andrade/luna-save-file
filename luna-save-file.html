@@ -3,7 +3,7 @@
 
     <ion-toolbar>
 
-      <ion-buttons start>
+      <ion-buttons left>
         <button (click)='openDirectory(parentEntry)' ion-button icon-only *ngIf="parentEntry && currentEntry.name != ''">
           <ion-icon name="arrow-back"></ion-icon>
         </button>
@@ -14,7 +14,7 @@
         {{title}}
       </ion-title>
 
-      <ion-buttons end>
+      <ion-buttons right>
         <button (click)='startDownload()' ion-button icon-only *ngIf='currentEntry && currentEntry.isDirectory'>
           <ion-icon name="download"></ion-icon>
         </button>
@@ -29,7 +29,7 @@
 
   <ion-list>
 
-    <button ion-item (click)='openDirectory(item)' *ngFor="let item of entries">
+    <button color='grey' ion-item (click)='openDirectory(item)' *ngFor="let item of entries">
       <ion-icon name="document" color='secondary' item-start *ngIf='item.isFile'></ion-icon>
       <ion-icon name="folder" color='primary' item-start *ngIf='item.isDirectory'></ion-icon>
       
